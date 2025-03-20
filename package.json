@@ -1,0 +1,35 @@
+{
+  "name": "expensetracker",
+  "version": "1.0.0",
+  "description": "Full-stack expense tracking application with budget management",
+  "main": "backend/index.js",
+  "scripts": {
+    "start": "node backend/index.js",
+    "server": "nodemon backend/index.js",
+    "dev": "nodemon backend/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "expense",
+    "tracker",
+    "budget",
+    "finance",
+    "mongodb",
+    "express",
+    "node"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.8.6",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
