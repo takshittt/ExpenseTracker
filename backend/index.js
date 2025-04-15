@@ -1,29 +1,37 @@
-// Import config files first
-require("./config/dotenv");
+const dotenv = require("dotenv");
+dotenv.config();
 const express = require("express");
+const app = express();
 const cors = require("cors");
 const connectDB = require("./config/db");
+const cookieParser = require("cookie-parser");
 
-const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  credentials: true
+}));
 app.use(express.json());
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
-// Connect to MongoDB
 connectDB();
 
-// Routes
 const expenseRoutes = require("./routes/expensesRoutes");
 const budgetRoutes = require("./routes/budgetRoutes");
 const authRoutes = require("./routes/authRoutes");
+const incomeRoutes = require("./routes/incomeRoutes");
 
-app.use("/api/auth", authRoutes);
-app.use("/api/expenses", expenseRoutes);
-app.use("/api/budgets", budgetRoutes);
+app.get("/", (req, res) => {
+  res.send("Expense Tracker API is running");
+});
 
-// Error handling middleware
+app.use("/auth", authRoutes);
+app.use("/expenses", expenseRoutes);
+app.use("/income", incomeRoutes);
+app.use("/budgets", budgetRoutes);
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
@@ -32,12 +40,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Root route
-app.get("/", (req, res) => {
-  res.send("Expense Tracker API is running");
-});
-
-// Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

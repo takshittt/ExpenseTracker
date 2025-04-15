@@ -1,34 +1,30 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const {
-  getBudgets,
-  getBudgetById,
-  createBudget,
-  updateBudget,
-  deleteBudget,
-  getBudgetPerformance,
-  getBudgetSummary
-} = require('../controllers/budgetController');
-const { protect } = require('../middlewares/authMiddleware');
+const budgetController = require("../controllers/budgetController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-// Apply protection middleware to all routes
-router.use(protect);
+// Apply auth middleware to all budget routes
+router.use(authMiddleware.authUser);
 
-// Summary route
-router.get('/summary', getBudgetSummary);
+// GET /budgets/summary - Get summary of all active budgets
+router.get("/summary", budgetController.getBudgetsSummary);
 
-// Main routes
-router.route('/')
-  .get(getBudgets)
-  .post(createBudget);
+// GET /budgets - Retrieve a list of all budgets
+router.get("/", budgetController.getBudgets);
 
-// Performance route
-router.get('/:id/performance', getBudgetPerformance);
+// GET /budgets/:id - Retrieve a specific budget by ID
+router.get("/:id", budgetController.getBudgetById);
 
-// Routes with ID parameter
-router.route('/:id')
-  .get(getBudgetById)
-  .put(updateBudget)
-  .delete(deleteBudget);
+// GET /budgets/:id/status - Get budget status with expenses
+router.get("/:id/status", budgetController.getBudgetStatus);
+
+// POST /budgets - Add a new budget
+router.post("/", budgetController.createBudget);
+
+// PUT /budgets/:id - Update a budget
+router.put("/:id", budgetController.updateBudget);
+
+// DELETE /budgets/:id - Delete a budget
+router.delete("/:id", budgetController.deleteBudget);
 
 module.exports = router;

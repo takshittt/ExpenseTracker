@@ -1,23 +1,58 @@
-const Budget = require('../models/budget.model');
-const Expense = require('../models/expenses.model');
-const mongoose = require('mongoose');
+const Budget = require("../models/budget.model");
+const Expense = require("../models/expenses.model");
+const mongoose = require("mongoose");
 
 // @desc    Get all budgets for a user
 // @route   GET /api/budgets
 // @access  Private
 exports.getBudgets = async (req, res) => {
   try {
-    const budgets = await Budget.find({ user: req.user._id }).sort({ createdAt: -1 });
+    // Default pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Build filter object
+    const filter = { user: req.user._id };
+
+    // Add category filter if provided
+    if (req.query.category) {
+      filter.category = req.query.category;
+    }
+
+    // Add period filter if provided
+    if (req.query.period) {
+      filter.period = req.query.period;
+    }
     
+    // Add active filter if provided
+    if (req.query.isActive !== undefined) {
+      filter.isActive = req.query.isActive === 'true';
+    }
+
+    // Execute query with pagination
+    const budgets = await Budget.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Get total count for pagination
+    const total = await Budget.countDocuments(filter);
+
     res.status(200).json({
       success: true,
       count: budgets.length,
-      data: budgets
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+      },
+      data: budgets,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -29,24 +64,24 @@ exports.getBudgetById = async (req, res) => {
   try {
     const budget = await Budget.findOne({
       _id: req.params.id,
-      user: req.user._id
+      user: req.user._id,
     });
-    
+
     if (!budget) {
       return res.status(404).json({
         success: false,
-        message: 'Budget not found'
+        message: "Budget not found",
       });
     }
-    
+
     res.status(200).json({
       success: true,
-      data: budget
+      data: budget,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -58,44 +93,22 @@ exports.createBudget = async (req, res) => {
   try {
     // Add user to request body
     req.body.user = req.user._id;
-    
-    // Check if budget for this category and period already exists
-    const existingBudget = await Budget.findOne({
-      user: req.user._id,
-      category: req.body.category,
-      period: req.body.period,
-      isActive: true,
-      $or: [
-        // Check if start date falls within an existing budget period
-        {
-          startDate: { $lte: new Date(req.body.startDate) },
-          endDate: { $gte: new Date(req.body.startDate) }
-        },
-        // Check if end date falls within an existing budget period
-        {
-          startDate: { $lte: new Date(req.body.endDate || req.body.startDate) },
-          endDate: { $gte: new Date(req.body.endDate || req.body.startDate) }
-        }
-      ]
-    });
-    
-    if (existingBudget) {
-      return res.status(400).json({
-        success: false,
-        message: `An active budget for ${req.body.category} already exists during this period`
-      });
+
+    // Check if startDate is provided
+    if (!req.body.startDate) {
+      req.body.startDate = new Date();
     }
-    
+
     const budget = await Budget.create(req.body);
-    
+
     res.status(201).json({
       success: true,
-      data: budget
+      data: budget,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -107,34 +120,30 @@ exports.updateBudget = async (req, res) => {
   try {
     let budget = await Budget.findOne({
       _id: req.params.id,
-      user: req.user._id
+      user: req.user._id,
     });
-    
+
     if (!budget) {
       return res.status(404).json({
         success: false,
-        message: 'Budget not found'
+        message: "Budget not found",
       });
     }
-    
+
     // Update budget
-    budget = await Budget.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true
-      }
-    );
-    
+    budget = await Budget.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
     res.status(200).json({
       success: true,
-      data: budget
+      data: budget,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -146,182 +155,225 @@ exports.deleteBudget = async (req, res) => {
   try {
     const budget = await Budget.findOne({
       _id: req.params.id,
-      user: req.user._id
+      user: req.user._id,
     });
-    
+
     if (!budget) {
       return res.status(404).json({
         success: false,
-        message: 'Budget not found'
+        message: "Budget not found",
       });
     }
-    
-    await budget.remove();
-    
+
+    await budget.deleteOne();
+
     res.status(200).json({
       success: true,
-      data: {}
+      data: {},
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
 
-// @desc    Get budget performance details
-// @route   GET /api/budgets/:id/performance
+// @desc    Get budget status with expenses
+// @route   GET /api/budgets/:id/status
 // @access  Private
-exports.getBudgetPerformance = async (req, res) => {
+exports.getBudgetStatus = async (req, res) => {
   try {
     const budget = await Budget.findOne({
       _id: req.params.id,
-      user: req.user._id
+      user: req.user._id,
     });
-    
+
     if (!budget) {
       return res.status(404).json({
         success: false,
-        message: 'Budget not found'
+        message: "Budget not found",
       });
     }
-    
-    // Get expenses for this budget period and category
-    const query = {
-      user: mongoose.Types.ObjectId(req.user._id),
-      date: {
-        $gte: budget.startDate,
-        $lte: budget.endDate || new Date()
+
+    // Calculate date range based on budget period
+    let startDate = new Date(budget.startDate);
+    let endDate = budget.endDate ? new Date(budget.endDate) : new Date();
+
+    if (!budget.endDate) {
+      // If no end date is specified, calculate based on period
+      const now = new Date();
+      
+      switch (budget.period) {
+        case 'Daily':
+          // Just use today
+          startDate = new Date(now.setHours(0, 0, 0, 0));
+          endDate = new Date(now.setHours(23, 59, 59, 999));
+          break;
+        case 'Weekly':
+          // Get beginning of week (Sunday)
+          const day = now.getDay();
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - day);
+          startDate.setHours(0, 0, 0, 0);
+          
+          endDate = new Date(startDate);
+          endDate.setDate(startDate.getDate() + 6);
+          endDate.setHours(23, 59, 59, 999);
+          break;
+        case 'Monthly':
+          // Get beginning of month
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+          break;
+        case 'Yearly':
+          // Get beginning of year
+          startDate = new Date(now.getFullYear(), 0, 1);
+          endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+          break;
       }
-    };
-    
-    // If not overall budget, filter by category
-    if (budget.category !== 'Overall') {
-      query.category = budget.category;
     }
+
+    // Get expenses in the category during the time period
+    const filter = {
+      user: req.user._id,
+      date: { $gte: startDate, $lte: endDate }
+    };
+
+    // If not an overall budget, filter by category
+    if (budget.category !== 'Overall') {
+      filter.category = budget.category;
+    }
+
+    const expenses = await Expense.find(filter);
     
-    // Calculate total expenses for this budget
-    const expenses = await Expense.aggregate([
-      { $match: query },
-      { $group: {
-          _id: null,
-          total: { $sum: '$amount' },
-          count: { $sum: 1 }
-        }
-      }
-    ]);
+    // Calculate total spent
+    const totalSpent = expenses.reduce((acc, expense) => acc + expense.amount, 0);
     
-    // Calculate daily/weekly expenses for trend analysis
-    const expensesByDate = await Expense.aggregate([
-      { $match: query },
-      { $group: {
-          _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
-          amount: { $sum: '$amount' }
-        }
-      },
-      { $sort: { _id: 1 } }
-    ]);
-    
-    const totalSpent = expenses.length > 0 ? expenses[0].total : 0;
+    // Calculate remaining budget
     const remaining = budget.amount - totalSpent;
+    
+    // Calculate percentage used
     const percentUsed = (totalSpent / budget.amount) * 100;
     
+    // Check if budget exceeded
+    const isExceeded = totalSpent > budget.amount;
+
     res.status(200).json({
       success: true,
       data: {
-        budget: {
-          _id: budget._id,
-          name: budget.name,
-          amount: budget.amount,
-          category: budget.category,
-          period: budget.period,
-          startDate: budget.startDate,
-          endDate: budget.endDate
+        budget,
+        stats: {
+          totalSpent,
+          remaining,
+          percentUsed,
+          isExceeded,
+          expenseCount: expenses.length
         },
-        performance: {
-          spent: totalSpent,
-          remaining: remaining,
-          percentUsed: percentUsed,
-          status: percentUsed > 100 ? 'exceeded' : percentUsed >= 80 ? 'warning' : 'good',
-          transactionCount: expenses.length > 0 ? expenses[0].count : 0
-        },
-        trend: expensesByDate
-      }
+        expenses: expenses.slice(0, 5) // Include latest 5 expenses
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
 
-// @desc    Get overall budget summary for all active budgets
+// @desc    Get all active budgets summary for dashboard
 // @route   GET /api/budgets/summary
 // @access  Private
-exports.getBudgetSummary = async (req, res) => {
+exports.getBudgetsSummary = async (req, res) => {
   try {
     // Get all active budgets
-    const activeBudgets = await Budget.find({
+    const budgets = await Budget.find({
       user: req.user._id,
       isActive: true
     });
-    
-    // Map through budgets and get performance data
-    const budgetPromises = activeBudgets.map(async (budget) => {
-      // Get expenses for this budget
-      const query = {
-        user: mongoose.Types.ObjectId(req.user._id),
-        date: {
-          $gte: budget.startDate,
-          $lte: budget.endDate || new Date()
+
+    const budgetSummaries = await Promise.all(budgets.map(async (budget) => {
+      // Calculate date range based on budget period
+      let startDate = new Date(budget.startDate);
+      let endDate = budget.endDate ? new Date(budget.endDate) : new Date();
+
+      if (!budget.endDate) {
+        // If no end date is specified, calculate based on period
+        const now = new Date();
+        
+        switch (budget.period) {
+          case 'Daily':
+            // Just use today
+            startDate = new Date(now.setHours(0, 0, 0, 0));
+            endDate = new Date(now.setHours(23, 59, 59, 999));
+            break;
+          case 'Weekly':
+            // Get beginning of week (Sunday)
+            const day = now.getDay();
+            startDate = new Date(now);
+            startDate.setDate(now.getDate() - day);
+            startDate.setHours(0, 0, 0, 0);
+            
+            endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            endDate.setHours(23, 59, 59, 999);
+            break;
+          case 'Monthly':
+            // Get beginning of month
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+            break;
+          case 'Yearly':
+            // Get beginning of year
+            startDate = new Date(now.getFullYear(), 0, 1);
+            endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+            break;
         }
-      };
-      
-      // If not overall budget, filter by category
-      if (budget.category !== 'Overall') {
-        query.category = budget.category;
       }
-      
-      // Calculate total expenses for this budget
-      const expenses = await Expense.aggregate([
-        { $match: query },
-        { $group: {
-            _id: null,
-            total: { $sum: '$amount' }
-          }
-        }
+
+      // Get expenses in the category during the time period
+      const filter = {
+        user: req.user._id,
+        date: { $gte: startDate, $lte: endDate }
+      };
+
+      // If not an overall budget, filter by category
+      if (budget.category !== 'Overall') {
+        filter.category = budget.category;
+      }
+
+      const totalSpent = await Expense.aggregate([
+        { $match: filter },
+        { $group: { _id: null, total: { $sum: "$amount" } } }
       ]);
-      
-      const totalSpent = expenses.length > 0 ? expenses[0].total : 0;
-      const remaining = budget.amount - totalSpent;
-      const percentUsed = (totalSpent / budget.amount) * 100;
-      
+
+      const spent = totalSpent.length > 0 ? totalSpent[0].total : 0;
+      const remaining = budget.amount - spent;
+      const percentUsed = (spent / budget.amount) * 100;
+
       return {
         _id: budget._id,
         name: budget.name,
         category: budget.category,
         period: budget.period,
         amount: budget.amount,
-        spent: totalSpent,
-        remaining: remaining,
-        percentUsed: percentUsed,
-        status: percentUsed > 100 ? 'exceeded' : percentUsed >= 80 ? 'warning' : 'good'
+        spent,
+        remaining,
+        percentUsed,
+        isExceeded: spent > budget.amount,
+        color: budget.color
       };
-    });
-    
-    const budgetSummaries = await Promise.all(budgetPromises);
-    
+    }));
+
     res.status(200).json({
       success: true,
       count: budgetSummaries.length,
-      data: budgetSummaries
+      data: budgetSummaries,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };

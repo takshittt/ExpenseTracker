@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const expenseSchema = new mongoose.Schema(
+const incomeSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -9,7 +9,7 @@ const expenseSchema = new mongoose.Schema(
     },
     title: {
       type: String,
-      required: [true, "Expense title is required"],
+      required: [true, "Income title is required"],
       trim: true,
     },
     amount: {
@@ -21,18 +21,13 @@ const expenseSchema = new mongoose.Schema(
       type: String,
       required: [true, "Category is required"],
       enum: [
-        "Food",
-        "Transportation",
-        "Entertainment",
-        "Shopping",
-        "Utilities",
-        "Housing",
-        "Healthcare",
-        "Personal",
-        "Education",
-        "Travel",
-        "Debt",
+        "Salary",
+        "Freelance",
         "Investments",
+        "Business",
+        "Gifts",
+        "Refunds",
+        "Rental",
         "Other",
       ],
       default: "Other",
@@ -46,26 +41,31 @@ const expenseSchema = new mongoose.Schema(
       default: Date.now,
       required: true,
     },
+    source: {
+      type: String,
+      trim: true,
+    },
     paymentMethod: {
       type: String,
       enum: [
+        "Bank Transfer",
         "Cash",
         "Credit Card",
-        "Debit Card",
-        "Bank Transfer",
+        "Debit Card", 
+        "PayPal",
         "Mobile Payment",
-        "Other",
+        "Check",
+        "Other"
       ],
-      default: "Cash",
+      default: "Bank Transfer",
     },
   },
   { timestamps: true }
 );
 
 // Create index for faster queries
-expenseSchema.index({ user: 1, date: -1 });
-expenseSchema.index({ category: 1 });
+incomeSchema.index({ user: 1, date: -1 });
 
-const Expense = mongoose.model("Expense", expenseSchema);
+const Income = mongoose.model("Income", incomeSchema);
 
-module.exports = Expense;
+module.exports = Income;

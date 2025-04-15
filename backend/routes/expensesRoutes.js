@@ -1,30 +1,36 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const {
-  getExpenses,
-  getExpenseById,
-  createExpense,
-  updateExpense,
-  deleteExpense,
-  getExpenseStats
-} = require('../controllers/expensesController');
-const { protect } = require('../middlewares/authMiddleware');
+const expensesController = require("../controllers/expensesController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-// Apply protection middleware to all routes
-router.use(protect);
+// Apply auth middleware to all expense routes
+router.use(authMiddleware.authUser);
 
-// Stats route
-router.get('/stats', getExpenseStats);
+// GET /expenses - Retrieve a list of all expenses
+router.get("/", expensesController.getExpenses);
 
-// Main routes
-router.route('/')
-  .get(getExpenses)
-  .post(createExpense);
+// GET /expenses/categories - Retrieve all expense categories
+router.get("/categories", expensesController.getCategories);
 
-// Routes with ID parameter
-router.route('/:id')
-  .get(getExpenseById)
-  .put(updateExpense)
-  .delete(deleteExpense);
+// GET /expenses/categories/:id - Retrieve a specific expense category
+router.get("/categories/:id", expensesController.getCategoryById);
+
+// GET /expenses/summary - Get a summary of expenses
+router.get("/summary", expensesController.getExpenseSummary);
+
+// GET /expenses/filter - Filter expenses by criteria
+router.get("/filter", expensesController.filterExpenses);
+
+// GET /expenses/:id - Retrieve a specific expense by ID
+router.get("/:id", expensesController.getExpenseById);
+
+// POST /expenses - Add a new expense
+router.post("/", expensesController.createExpense);
+
+// PUT /expenses/:id - Update an existing expense
+router.put("/:id", expensesController.updateExpense);
+
+// DELETE /expenses/:id - Delete an expense
+router.delete("/:id", expensesController.deleteExpense);
 
 module.exports = router;
