@@ -30,6 +30,15 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    provider: {
+      type: String,
+      enum: ['local', 'google', 'github'],
+      default: 'local'
+    },
+    providerId: {
+      type: String,
+      default: null
+    },
     createdAt: {
       type: Date,
       default: Date.now,

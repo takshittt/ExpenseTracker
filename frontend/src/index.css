@@ -1,1 +1,78 @@
 @import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 255, 255, 255;
+}
+
+.dark {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 15, 23, 42;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background-color: rgb(var(--background-rgb));
+  transition: color 0.2s, background-color 0.2s;
+}
+
+/* Dark mode overrides */
+.dark .bg-white {
+  background-color: rgb(30, 41, 59);
+  color: rgb(229, 231, 235);
+}
+
+.dark .bg-gray-100 {
+  background-color: rgb(15, 23, 42);
+}
+
+.dark .text-gray-800 {
+  color: rgb(229, 231, 235);
+}
+
+.dark .text-gray-700 {
+  color: rgb(209, 213, 219);
+}
+
+.dark .text-gray-600 {
+  color: rgb(156, 163, 175);
+}
+
+.dark .text-gray-500 {
+  color: rgb(107, 114, 128);
+}
+
+.dark .border-gray-200 {
+  border-color: rgb(55, 65, 81);
+}
+
+.dark .shadow-lg, 
+.dark .shadow-md, 
+.dark .shadow {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 
+              0 4px 6px -2px rgba(0, 0, 0, 0.25);
+}
+
+.dark .bg-gray-50 {
+  background-color: rgb(51, 65, 85);
+}
+
+.dark .divide-gray-200 > * + * {
+  border-color: rgb(55, 65, 81);
+}
+
+.dark .border {
+  border-color: rgb(55, 65, 81);
+}
+
+.dark .bg-gray-200 {
+  background-color: rgb(51, 65, 85);
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: rgb(51, 65, 85);
+}

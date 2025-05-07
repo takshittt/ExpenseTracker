@@ -25,6 +25,9 @@ module.exports.registerUser = async (req, res) => {
   });
 
   const token = user.generateAuthToken();
+  
+  // Set the authentication cookie
+  res.cookie("token", token);
 
   res.status(201).json({ token, user });
 };
@@ -54,6 +57,17 @@ module.exports.signinUser = async (req, res, next) => {
   res.cookie("token", token);
 
   res.status(200).json({ token, user });
+};
+
+module.exports.googleAuthCallback = async (req, res) => {
+  // This function is called after successful Google authentication
+  const token = req.user.generateAuthToken();
+  
+  // Set cookie
+  res.cookie("token", token);
+  
+  // Redirect to frontend with token
+  res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/auth-success?token=${token}`);
 };
 
 module.exports.getUserProfile = async (req, res) => {

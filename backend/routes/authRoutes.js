@@ -3,6 +3,7 @@ const router = express.Router();
 const { body } = require("express-validator");
 const authController = require("../controllers/authController");
 const authMiddleware = require("../middlewares/authMiddleware");
+const passport = require("passport");
 
 router.post(
   "/register",
@@ -27,6 +28,21 @@ router.post(
       .withMessage("Password must be at least 6 characters long"),
   ],
   authController.signinUser
+);
+
+// Google OAuth Routes
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { 
+    failureRedirect: "/signin",
+    session: false 
+  }),
+  authController.googleAuthCallback
 );
 
 router.get("/profile", authMiddleware.authUser, authController.getUserProfile);

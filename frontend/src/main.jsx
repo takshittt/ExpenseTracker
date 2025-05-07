@@ -5,15 +5,18 @@ import UserContext from "./context/UserContext.jsx";
 import ExpensesContext from "./context/ExpensesContext.jsx";
 import IncomeContext from "./context/incomeContext.jsx";
 import BudgetContext from "./context/BudgetContext.jsx";
+import ThemeProvider from "./context/ThemeContext.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <UserContext>
-    <ExpensesContext>
-      <IncomeContext>
-        <BudgetContext>
-          <App />
-        </BudgetContext>
-      </IncomeContext>
-    </ExpensesContext>
-  </UserContext>
+  <ThemeProvider>
+    <UserContext>
+      <ExpensesContext>
+        <IncomeContext>
+          <BudgetContext>
+            <App />
+          </BudgetContext>
+        </IncomeContext>
+      </ExpensesContext>
+    </UserContext>
+  </ThemeProvider>
 );
