@@ -10,8 +10,24 @@ require("./config/passport");
 
 const PORT = process.env.PORT || 5001;
 
+// Updated CORS configuration to handle multiple origins
 app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl requests)
+    if(!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      process.env.CLIENT_URL || "http://localhost:5173",
+      "https://expense-tracker-vk78.vercel.app",
+      "https://expense-tracker-vk78-4pb80d8z1-takshittts-projects.vercel.app"
+    ];
+    
+    if(allowedOrigins.indexOf(origin) !== -1 || origin.includes("expense-tracker-vk78")) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
