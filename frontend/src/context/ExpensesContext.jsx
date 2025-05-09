@@ -80,7 +80,7 @@ const expensesReducer = (state, action) => {
 };
 
 // Configure axios default base URL
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+axios.defaults.baseURL = (import.meta.env.VITE_API_URL || 'http://localhost:5001').replace(/\/+$/, "");
 
 // Context Provider component
 const ExpensesContext = ({ children }) => {
