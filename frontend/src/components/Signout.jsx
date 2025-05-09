@@ -11,8 +11,7 @@ export const Signout = () => {
   useEffect(() => {
     const performSignout = async () => {
       try {
-        const baseUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, "");
-        await axios.get(`${baseUrl}/auth/Signout`, {
+        await axios.get(`/auth/Signout`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

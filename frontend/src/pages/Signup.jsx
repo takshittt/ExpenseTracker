@@ -34,10 +34,8 @@ const Signup = () => {
       password: password,
     };
 
-    const baseUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, "");
-
     try {
-      const response = await axios.post(`${baseUrl}/auth/register`, newUser, {
+      const response = await axios.post('/auth/register', newUser, {
         withCredentials: true
       });
 
@@ -47,7 +45,7 @@ const Signup = () => {
         localStorage.setItem("token", data.token);
         
         // Make a request to get the user profile to ensure proper session setup
-        await axios.get(`${baseUrl}/auth/profile`, {
+        await axios.get('/auth/profile', {
           headers: {
             Authorization: `Bearer ${data.token}`
           },
@@ -70,8 +68,7 @@ const Signup = () => {
   };
 
   const handleGoogleSignIn = () => {
-    const baseUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, "");
-    window.location.href = `${baseUrl}/auth/google`;
+    window.location.href = `${axios.defaults.baseURL}/auth/google`;
   };
 
   return (

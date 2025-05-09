@@ -21,8 +21,7 @@ const Signin = () => {
         password: password,
       };
 
-      const baseUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, "");
-      const response = await axios.post(`${baseUrl}/auth/signin`, userData, {
+      const response = await axios.post('/auth/signin', userData, {
         withCredentials: true
       });
       
@@ -42,8 +41,7 @@ const Signin = () => {
   };
 
   const handleGoogleSignIn = () => {
-    const baseUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, "");
-    window.location.href = `${baseUrl}/auth/google`;
+    window.location.href = `${axios.defaults.baseURL}/auth/google`;
   };
 
   return (

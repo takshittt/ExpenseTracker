@@ -18,8 +18,8 @@ const AuthSuccess = () => {
       // Get user profile from API
       const fetchUserProfile = async () => {
         try {
-          const baseUrl = import.meta.env.VITE_API_URL.replace(/\/+$/, "");
-          const response = await axios.get(`${baseUrl}/auth/profile`, {
+          // Use axios defaults instead of constructing URL
+          const response = await axios.get('/auth/profile', {
             headers: {
               Authorization: `Bearer ${token}`
             },
