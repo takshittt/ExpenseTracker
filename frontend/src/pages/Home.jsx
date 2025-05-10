@@ -855,8 +855,8 @@ const Home = () => {
 
         {/* Add Expense Modal */}
         {showExpenseModal && (
-          <div className="fixed inset-0 bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto my-8 overflow-hidden transform transition-all">
               {/* Modal Header */}
               <div className="bg-gradient-to-r from-red-500 to-rose-600 px-6 py-4 text-white">
                 <div className="flex items-center justify-between">
@@ -870,7 +870,7 @@ const Home = () => {
               </div>
               
               {/* Modal Body */}
-              <form onSubmit={handleSubmitExpense} className="p-6">
+              <form onSubmit={handleSubmitExpense} className="p-4 sm:p-6 overflow-y-auto max-h-[80vh]">
                 <div className="space-y-4">
                   {/* Title Input */}
                   <div>
@@ -1022,8 +1022,8 @@ const Home = () => {
 
         {/* Transaction Details Modal */}
         {showDetailsModal && selectedTransaction && (
-          <div className="fixed inset-0 bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto my-8 overflow-hidden transform transition-all">
               {/* Modal Header */}
               <div className={`px-6 py-4 text-white ${selectedTransaction.transactionType === 'income' ? 'bg-gradient-to-r from-green-500 to-teal-600' : 'bg-gradient-to-r from-red-500 to-rose-600'}`}>
                 <div className="flex items-center justify-between">
@@ -1039,7 +1039,7 @@ const Home = () => {
               </div>
               
               {/* Modal Body */}
-              <div className="p-6">
+              <div className="p-4 sm:p-6 overflow-y-auto max-h-[80vh]">
                 {/* Transaction Title and Amount */}
                 <div className="mb-6 flex justify-between items-center">
                   <h2 className="text-2xl font-bold text-gray-800">{selectedTransaction.title || "Untitled"}</h2>
@@ -1168,8 +1168,8 @@ const Home = () => {
 
         {/* Add Income Modal */}
         {showIncomeModal && (
-          <div className="fixed inset-0 bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto my-8 overflow-hidden transform transition-all">
               {/* Modal Header */}
               <div className="bg-gradient-to-r from-green-500 to-teal-600 px-6 py-4 text-white">
                 <div className="flex items-center justify-between">
@@ -1183,7 +1183,7 @@ const Home = () => {
               </div>
               
               {/* Modal Body */}
-              <form onSubmit={handleSubmitIncome} className="p-6">
+              <form onSubmit={handleSubmitIncome} className="p-4 sm:p-6 overflow-y-auto max-h-[80vh]">
                 <div className="space-y-4">
                   {/* Title Input */}
                   <div>
@@ -1359,7 +1359,7 @@ const Home = () => {
 
         {/* All Transactions Modal */}
         {showAllTransactionsModal && (
-          <div className="fixed inset-0 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-auto">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-auto">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
               {/* Modal Header */}
               <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4 text-white sticky top-0">

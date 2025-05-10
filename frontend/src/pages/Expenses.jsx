@@ -293,8 +293,8 @@ const Expenses = () => {
 
                     {/* Add Expense Modal */}
                     {showAddModal && (
-                        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4">
-                            <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                            <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto my-8 overflow-hidden transform transition-all">
                                 {/* Modal Header */}
                                 <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4 text-white">
                                     <div className="flex items-center justify-between">
@@ -308,7 +308,7 @@ const Expenses = () => {
                                 </div>
                                 
                                 {/* Modal Body */}
-                                <form onSubmit={handleAddSubmit} className="p-6">
+                                <form onSubmit={handleAddSubmit} className="p-4 sm:p-6 overflow-y-auto max-h-[80vh]">
                                     <div className="space-y-4">
                                         {/* Title Input */}
                                         <div>
@@ -461,8 +461,8 @@ const Expenses = () => {
 
                     {/* Edit Expense Modal */}
                     {showEditModal && (
-                        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4">
-                            <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                            <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto my-8 overflow-hidden transform transition-all">
                                 {/* Modal Header */}
                                 <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4 text-white">
                                     <div className="flex items-center justify-between">
@@ -476,7 +476,7 @@ const Expenses = () => {
                                 </div>
                                 
                                 {/* Modal Body */}
-                                <form onSubmit={handleEditSubmit} className="p-6">
+                                <form onSubmit={handleEditSubmit} className="p-4 sm:p-6 overflow-y-auto max-h-[80vh]">
                                     <div className="space-y-4">
                                         {/* Title Input */}
                                         <div>

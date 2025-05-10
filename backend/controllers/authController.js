@@ -60,14 +60,27 @@ module.exports.signinUser = async (req, res, next) => {
 };
 
 module.exports.googleAuthCallback = async (req, res) => {
-  // This function is called after successful Google authentication
-  const token = req.user.generateAuthToken();
-  
-  // Set cookie
-  res.cookie("token", token);
-  
-  // Redirect to frontend with token
-  res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/auth-success?token=${token}`);
+  try {
+    if (!req.user) {
+      return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/signin?error=authentication_failed`);
+    }
+
+    const token = req.user.generateAuthToken();
+    
+    // Set cookie with proper options
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+    
+    // Redirect to frontend with token
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/auth-success?token=${token}`);
+  } catch (error) {
+    console.error('Google auth callback error:', error);
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/signin?error=server_error`);
+  }
 };
 
 module.exports.getUserProfile = async (req, res) => {
