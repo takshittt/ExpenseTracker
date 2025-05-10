@@ -39,7 +39,9 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", { 
-    failureRedirect: "/signin",
+    failureRedirect: process.env.NODE_ENV === 'production' 
+      ? 'https://your-frontend-domain.com/signin'  // Replace with your actual frontend domain
+      : 'http://localhost:3000/signin',
     session: false 
   }),
   authController.googleAuthCallback
