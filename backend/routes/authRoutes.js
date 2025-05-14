@@ -35,9 +35,9 @@ router.get(
   "/google",
   passport.authenticate("google", { 
     scope: ["profile", "email"],
-    callbackURL: process.env.NODE_ENV === 'production'
+    callbackURL: process.env.GOOGLE_CALLBACK_URL || (process.env.NODE_ENV === 'production'
       ? 'https://expense-tracker-api-9pi7.onrender.com/auth/google/callback'
-      : 'http://localhost:5001/auth/google/callback'
+      : 'http://localhost:5001/auth/google/callback')
   })
 );
 

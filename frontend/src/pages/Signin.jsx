@@ -41,7 +41,12 @@ const Signin = () => {
   };
 
   const handleGoogleSignIn = () => {
-    window.location.href = `${axios.defaults.baseURL}/auth/google`;
+    // Use the environment variable directly for production-ready code
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    window.location.href = `${apiUrl}/auth/google`;
+    
+    // Log for debugging
+    console.log(`Redirecting to: ${apiUrl}/auth/google`);
   };
 
   return (
