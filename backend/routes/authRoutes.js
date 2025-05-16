@@ -33,16 +33,23 @@ router.post(
 // Google OAuth Routes
 router.get(
   "/google",
+  (req, res, next) => {
+    console.log("Google OAuth request received");
+    console.log("Environment:", process.env.NODE_ENV);
+    console.log("Callback URL:", process.env.GOOGLE_CALLBACK_URL);
+    next();
+  },
   passport.authenticate("google", { 
-    scope: ["profile", "email"],
-    callbackURL: process.env.GOOGLE_CALLBACK_URL || (process.env.NODE_ENV === 'production'
-      ? 'https://expense-tracker-api-9pi7.onrender.com/auth/google/callback'
-      : 'http://localhost:5001/auth/google/callback')
+    scope: ["profile", "email"]
   })
 );
 
 router.get(
   "/google/callback",
+  (req, res, next) => {
+    console.log("Google OAuth callback received");
+    next();
+  },
   passport.authenticate("google", { 
     failureRedirect: process.env.NODE_ENV === 'production' 
       ? 'https://expense-tracker-vk78.vercel.app/signin'

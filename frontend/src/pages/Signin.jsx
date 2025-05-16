@@ -42,7 +42,8 @@ const Signin = () => {
 
   const handleGoogleSignIn = () => {
     // Use the environment variable directly for production-ready code
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    const apiUrl = import.meta.env.VITE_API_URL || 
+      (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://expense-tracker-api-9pi7.onrender.com');
     window.location.href = `${apiUrl}/auth/google`;
     
     // Log for debugging

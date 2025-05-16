@@ -11,6 +11,8 @@ const AuthSuccess = () => {
   useEffect(() => {
     const token = searchParams.get('token');
     
+    console.log("AuthSuccess: Token present:", !!token);
+    
     if (token) {
       // Store token
       localStorage.setItem('token', token);
@@ -18,6 +20,7 @@ const AuthSuccess = () => {
       // Get user profile from API
       const fetchUserProfile = async () => {
         try {
+          console.log("Fetching user profile with token");
           // Use axios defaults instead of constructing URL
           const response = await axios.get('/auth/profile', {
             headers: {
@@ -27,6 +30,7 @@ const AuthSuccess = () => {
           });
           
           if (response.status === 200) {
+            console.log("User profile fetched successfully");
             setUser(response.data.user);
             navigate('/home');
           }
@@ -39,6 +43,7 @@ const AuthSuccess = () => {
       fetchUserProfile();
     } else {
       // No token found, redirect to signin
+      console.error("No token found in URL parameters");
       navigate('/signin');
     }
   }, [searchParams, setUser, navigate]);

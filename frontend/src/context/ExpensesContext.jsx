@@ -80,7 +80,8 @@ const expensesReducer = (state, action) => {
 };
 
 // Configure axios default base URL
-axios.defaults.baseURL = (import.meta.env.VITE_API_URL || 'http://localhost:5001').replace(/\/+$/, "");
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || 
+  (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://expense-tracker-api-9pi7.onrender.com');
 
 // Context Provider component
 const ExpensesContext = ({ children }) => {

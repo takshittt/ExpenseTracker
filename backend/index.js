@@ -18,13 +18,13 @@ app.use(cors({
     
     const allowedOrigins = [
       process.env.CLIENT_URL || "http://localhost:5173",
-      "https://expense-tracker-vk78.vercel.app",
-      "https://expense-tracker-vk78-4pb80d8z1-takshittts-projects.vercel.app"
+      "https://expense-tracker-vk78.vercel.app"
     ];
     
-    if(allowedOrigins.indexOf(origin) !== -1 || origin.includes("expense-tracker-vk78")) {
+    if(allowedOrigins.indexOf(origin) !== -1 || !origin || origin.includes("expense-tracker-vk78")) {
       callback(null, true);
     } else {
+      console.log(`CORS blocked for origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },

@@ -68,7 +68,9 @@ const Signup = () => {
   };
 
   const handleGoogleSignIn = () => {
-    window.location.href = `${axios.defaults.baseURL}/auth/google`;
+    const apiUrl = import.meta.env.VITE_API_URL || 
+      (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://expense-tracker-api-9pi7.onrender.com');
+    window.location.href = `${apiUrl}/auth/google`;
   };
 
   return (

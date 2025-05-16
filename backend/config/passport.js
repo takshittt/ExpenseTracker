@@ -28,11 +28,14 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
+        console.log("Google OAuth callback received for profile:", profile.id);
+        
         // Check if user already exists
         let user = await userModel.findOne({ email: profile.emails[0].value });
 
         if (user) {
           // User exists, return the user
+          console.log("Existing user found:", user.email);
           return done(null, user);
         }
 
@@ -49,9 +52,12 @@ passport.use(
           provider: 'google',
           providerId: profile.id
         });
+        
+        console.log("New user created via Google OAuth:", user.email);
 
         return done(null, user);
       } catch (error) {
+        console.error("Google OAuth error:", error);
         return done(error, null);
       }
     }
