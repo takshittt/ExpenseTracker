@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useContext, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { UserDataContext } from "../context/UserContext";
 import axios from "axios";
 
@@ -8,12 +8,31 @@ const Signin = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [userData, setUserData] = useState({});
+  const [error, setError] = useState("");
+  const [searchParams] = useSearchParams();
 
   const { user, setUser } = useContext(UserDataContext);
   const navigate = useNavigate();
 
+  // Check for error parameter in URL
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      if (errorParam === 'authentication_failed') {
+        setError("Authentication failed. Please try again.");
+      } else if (errorParam === 'server_error') {
+        setError("Server error occurred. Please try again later.");
+      } else if (errorParam === 'no_token') {
+        setError("Authentication token not found. Please try again.");
+      } else if (errorParam === 'profile_fetch_failed') {
+        setError("Failed to fetch user profile. Please try again.");
+      }
+    }
+  }, [searchParams]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
       const userData = {
@@ -32,7 +51,7 @@ const Signin = () => {
         navigate("/home");
       }
     } catch (error) {
-      alert(error.response?.data?.error || "Sign in failed. Please check your credentials.");
+      setError(error.response?.data?.error || "Sign in failed. Please check your credentials.");
       console.error("Signin error:", error.response?.data || error.message);
     } finally {
       setemail("");
@@ -41,13 +60,18 @@ const Signin = () => {
   };
 
   const handleGoogleSignIn = () => {
-    // Use the environment variable directly for production-ready code
+    // Clear any previous errors
+    setError("");
+    
+    // Determine API URL based on environment
     const apiUrl = import.meta.env.VITE_API_URL || 
       (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://expense-tracker-api-9pi7.onrender.com');
-    window.location.href = `${apiUrl}/auth/google`;
     
     // Log for debugging
     console.log(`Redirecting to: ${apiUrl}/auth/google`);
+    
+    // Redirect to Google OAuth endpoint
+    window.location.href = `${apiUrl}/auth/google`;
   };
 
   return (
@@ -67,6 +91,21 @@ const Signin = () => {
             </Link>
           </p>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
@@ -144,6 +183,7 @@ const Signin = () => {
           <div className="mt-6 grid grid-cols-1 gap-3">
             <div>
               <button 
+                type="button"
                 onClick={handleGoogleSignIn}
                 className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
               >

@@ -25,8 +25,11 @@ const AuthSuccess = () => {
           // Set default Authorization header for all future requests
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           
-          // Use axios defaults instead of constructing URL
-          const response = await axios.get('/auth/profile', {
+          const apiUrl = import.meta.env.VITE_API_URL || 
+            (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://expense-tracker-api-9pi7.onrender.com');
+          
+          // Use absolute URL to avoid CORS issues
+          const response = await axios.get(`${apiUrl}/auth/profile`, {
             headers: {
               Authorization: `Bearer ${token}`
             },
@@ -55,10 +58,11 @@ const AuthSuccess = () => {
   }, [searchParams, setUser, navigate]);
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex items-center justify-center h-screen bg-gray-50">
       <div className="text-center p-8 bg-white rounded-lg shadow-md">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
         <p className="text-lg text-gray-700">Authenticating...</p>
+        <p className="text-sm text-gray-500 mt-2">Please wait while we log you in</p>
       </div>
     </div>
   );

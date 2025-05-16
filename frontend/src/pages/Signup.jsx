@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useContext, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { UserDataContext } from "../context/UserContext";
 
@@ -10,21 +10,40 @@ const Signup = () => {
   const [name, setname] = useState("");
   const [confirmPassword, setconfirmPassword] = useState("");
   const [userData, setUserData] = useState({});
+  const [error, setError] = useState("");
+  const [searchParams] = useSearchParams();
 
   const navigate = useNavigate();
 
   const { user, setUser } = useContext(UserDataContext);
+  
+  // Check for error parameter in URL
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      if (errorParam === 'authentication_failed') {
+        setError("Authentication failed. Please try again.");
+      } else if (errorParam === 'server_error') {
+        setError("Server error occurred. Please try again later.");
+      } else if (errorParam === 'no_token') {
+        setError("Authentication token not found. Please try again.");
+      } else if (errorParam === 'profile_fetch_failed') {
+        setError("Failed to fetch user profile. Please try again.");
+      }
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      setError("Passwords do not match!");
       return;
     }
 
     if (password.length < 6) {
-      alert("Password must be at least 6 characters long");
+      setError("Password must be at least 6 characters long");
       return;
     }
 
@@ -55,9 +74,7 @@ const Signup = () => {
         navigate("/home");
       }
     } catch (error) {
-      alert(
-        error.response?.data?.error || "Registration failed. Please try again."
-      );
+      setError(error.response?.data?.error || "Registration failed. Please try again.");
       console.error("Signup error:", error.response?.data || error.message);
     } finally {
       setname("");
@@ -68,8 +85,17 @@ const Signup = () => {
   };
 
   const handleGoogleSignIn = () => {
+    // Clear any previous errors
+    setError("");
+    
+    // Determine API URL based on environment
     const apiUrl = import.meta.env.VITE_API_URL || 
       (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://expense-tracker-api-9pi7.onrender.com');
+    
+    // Log for debugging
+    console.log(`Redirecting to: ${apiUrl}/auth/google`);
+    
+    // Redirect to Google OAuth endpoint
     window.location.href = `${apiUrl}/auth/google`;
   };
 
@@ -90,6 +116,21 @@ const Signup = () => {
             </Link>
           </p>
         </div>
+        
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
@@ -106,7 +147,9 @@ const Signup = () => {
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Full Name"
                 value={name}
-                onChange={(e) => setname(e.target.value)}
+                onChange={(e) => {
+                  setname(e.target.value);
+                }}
               />
             </div>
             <div>
@@ -122,7 +165,9 @@ const Signup = () => {
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
                 value={email}
-                onChange={(e) => setemail(e.target.value)}
+                onChange={(e) => {
+                  setemail(e.target.value);
+                }}
               />
             </div>
             <div>
@@ -138,7 +183,9 @@ const Signup = () => {
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={password}
-                onChange={(e) => setpassword(e.target.value)}
+                onChange={(e) => {
+                  setpassword(e.target.value);
+                }}
               />
             </div>
             <div>
@@ -154,7 +201,9 @@ const Signup = () => {
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Confirm Password"
                 value={confirmPassword}
-                onChange={(e) => setconfirmPassword(e.target.value)}
+                onChange={(e) => {
+                  setconfirmPassword(e.target.value);
+                }}
               />
             </div>
           </div>
@@ -164,7 +213,7 @@ const Signup = () => {
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Create Account
+              Sign up
             </button>
           </div>
         </form>
@@ -184,6 +233,7 @@ const Signup = () => {
           <div className="mt-6 grid grid-cols-1 gap-3">
             <div>
               <button
+                type="button"
                 onClick={handleGoogleSignIn}
                 className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
               >
