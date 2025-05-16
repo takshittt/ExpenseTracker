@@ -16,7 +16,7 @@ This application provides a complete solution for personal finance management, a
 ### Backend
 - **Node.js** & **Express**: Server framework
 - **MongoDB** with **Mongoose**: Database and ORM
-- **JWT** & **Passport**: Authentication with support for Google OAuth
+- **JWT**: Authentication
 - **Express Validator**: Input validation
 - **Bcrypt**: Password hashing
 
@@ -32,7 +32,7 @@ This application provides a complete solution for personal finance management, a
 ```
 expenseTracker/
 ├── backend/                # Server-side code
-│   ├── config/             # Database and auth configuration
+│   ├── config/             # Database configuration
 │   ├── controllers/        # Route handlers
 │   ├── middlewares/        # Custom middlewares
 │   ├── models/             # MongoDB schemas
@@ -58,7 +58,6 @@ expenseTracker/
 
 ### User Authentication
 - Email and password signup/login
-- Google OAuth integration
 - JWT-based authentication
 - Password reset functionality
 
@@ -113,8 +112,6 @@ expenseTracker/
    MONGODB_URI=your_mongodb_connection_string
    JWT_SECRET=your_jwt_secret
    CLIENT_URL=http://localhost:5173
-   GOOGLE_CLIENT_ID=your_google_client_id
-   GOOGLE_CLIENT_SECRET=your_google_client_secret
    ```
 
 4. Start the development servers:

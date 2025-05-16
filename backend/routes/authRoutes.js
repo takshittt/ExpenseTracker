@@ -37,12 +37,6 @@ router.get(
     console.log("Google OAuth request received");
     console.log("Environment:", process.env.NODE_ENV);
     console.log("Callback URL:", process.env.GOOGLE_CALLBACK_URL);
-    console.log("Client URL:", process.env.CLIENT_URL);
-    console.log("Request headers:", {
-      host: req.headers.host,
-      origin: req.headers.origin,
-      referer: req.headers.referer
-    });
     next();
   },
   passport.authenticate("google", { 
@@ -54,12 +48,6 @@ router.get(
   "/google/callback",
   (req, res, next) => {
     console.log("Google OAuth callback received");
-    console.log("Request query parameters:", req.query);
-    console.log("Request headers:", {
-      host: req.headers.host,
-      origin: req.headers.origin,
-      referer: req.headers.referer
-    });
     next();
   },
   passport.authenticate("google", { 
