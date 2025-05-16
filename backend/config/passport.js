@@ -17,6 +17,14 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
+// Log environment variables for debugging (without exposing secrets)
+console.log("Google OAuth Configuration:");
+console.log("- NODE_ENV:", process.env.NODE_ENV);
+console.log("- CLIENT_URL:", process.env.CLIENT_URL);
+console.log("- GOOGLE_CALLBACK_URL:", process.env.GOOGLE_CALLBACK_URL);
+console.log("- GOOGLE_CLIENT_ID exists:", !!process.env.GOOGLE_CLIENT_ID);
+console.log("- GOOGLE_CLIENT_SECRET exists:", !!process.env.GOOGLE_CLIENT_SECRET);
+
 // Google Strategy
 passport.use(
   new GoogleStrategy(
@@ -24,7 +32,8 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.GOOGLE_CALLBACK_URL,
-      scope: ['profile', 'email']
+      scope: ['profile', 'email'],
+      proxy: true // Important for handling proxied requests
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

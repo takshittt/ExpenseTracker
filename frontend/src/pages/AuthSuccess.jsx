@@ -21,6 +21,10 @@ const AuthSuccess = () => {
       const fetchUserProfile = async () => {
         try {
           console.log("Fetching user profile with token");
+          
+          // Set default Authorization header for all future requests
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          
           // Use axios defaults instead of constructing URL
           const response = await axios.get('/auth/profile', {
             headers: {
@@ -36,7 +40,9 @@ const AuthSuccess = () => {
           }
         } catch (error) {
           console.error('Error fetching user profile:', error);
-          navigate('/signin');
+          // Clear any invalid token
+          localStorage.removeItem('token');
+          navigate('/signin?error=profile_fetch_failed');
         }
       };
       
@@ -44,24 +50,15 @@ const AuthSuccess = () => {
     } else {
       // No token found, redirect to signin
       console.error("No token found in URL parameters");
-      navigate('/signin');
+      navigate('/signin?error=no_token');
     }
   }, [searchParams, setUser, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 text-center">
-        <div className="animate-pulse">
-          <svg className="mx-auto h-12 w-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-          </svg>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Authenticating...
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Please wait while we log you in
-          </p>
-        </div>
+    <div className="flex items-center justify-center h-screen">
+      <div className="text-center p-8 bg-white rounded-lg shadow-md">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+        <p className="text-lg text-gray-700">Authenticating...</p>
       </div>
     </div>
   );

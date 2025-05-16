@@ -71,11 +71,11 @@ module.exports.googleAuthCallback = async (req, res) => {
     console.log("User authenticated successfully:", req.user.email);
     const token = req.user.generateAuthToken();
     
-    // Set cookie with proper options
+    // Updated cookie settings for cross-domain usage
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: true, // Always use secure in production
+      sameSite: 'none', // Required for cross-site cookie
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
     
