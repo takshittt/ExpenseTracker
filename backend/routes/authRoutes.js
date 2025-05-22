@@ -33,34 +33,22 @@ router.post(
 // Google OAuth Routes
 router.get(
   "/google",
-  (req, res, next) => {
-    console.log("Google OAuth request received");
-    console.log("Environment:", process.env.NODE_ENV);
-    console.log("Callback URL:", process.env.GOOGLE_CALLBACK_URL);
-    next();
-  },
-  passport.authenticate("google", { 
-    scope: ["profile", "email"]
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
   })
 );
 
 router.get(
   "/google/callback",
-  (req, res, next) => {
-    console.log("Google OAuth callback received");
-    next();
-  },
-  passport.authenticate("google", { 
-    failureRedirect: process.env.NODE_ENV === 'production' 
-      ? 'https://expense-tracker-vk78.vercel.app/signin'
-      : 'http://localhost:3000/signin',
-    session: false 
+  passport.authenticate("google", {
+    failureRedirect: `${process.env.CLIENT_URL}/signin?error=authentication_failed`,
+    session: false,
   }),
   authController.googleAuthCallback
 );
 
 router.get("/profile", authMiddleware.authUser, authController.getUserProfile);
 
-router.get("/Signout", authMiddleware.authUser, authController.SignoutUser);
+router.get("/signout", authMiddleware.authUser, authController.SignoutUser);
 
 module.exports = router;

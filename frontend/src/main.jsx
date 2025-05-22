@@ -6,6 +6,11 @@ import ExpensesContext from "./context/ExpensesContext.jsx";
 import IncomeContext from "./context/incomeContext.jsx";
 import BudgetContext from "./context/BudgetContext.jsx";
 import ThemeProvider from "./context/ThemeContext.jsx";
+import "./utils/axiosConfig.js";
+import { initAuth } from "./utils/auth.js";
+
+// Initialize authentication on app load
+initAuth();
 
 createRoot(document.getElementById("root")).render(
   <ThemeProvider>

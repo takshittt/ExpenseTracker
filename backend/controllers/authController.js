@@ -25,7 +25,7 @@ module.exports.registerUser = async (req, res) => {
   });
 
   const token = user.generateAuthToken();
-  
+
   // Set the authentication cookie
   res.cookie("token", token);
 
@@ -62,31 +62,34 @@ module.exports.signinUser = async (req, res, next) => {
 module.exports.googleAuthCallback = async (req, res) => {
   try {
     console.log("Google auth callback received");
-    
+
     if (!req.user) {
       console.error("No user object in request");
-      return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/signin?error=authentication_failed`);
+      return res.redirect(
+        `${process.env.CLIENT_URL}/signin?error=authentication_failed`
+      );
     }
 
     console.log("User authenticated successfully:", req.user.email);
     const token = req.user.generateAuthToken();
-    
+
     // Set cookie with proper options
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
-    
-    const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/auth-success?token=${token}`;
+
+    // Redirect to frontend with token in URL
+    const redirectUrl = `${process.env.CLIENT_URL}/auth-success?token=${token}`;
     console.log("Redirecting to:", redirectUrl);
-    
-    // Redirect to frontend with token
+
+    // Redirect to frontend
     res.redirect(redirectUrl);
   } catch (error) {
-    console.error('Google auth callback error:', error);
-    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/signin?error=server_error`);
+    console.error("Google auth callback error:", error);
+    res.redirect(`${process.env.CLIENT_URL}/signin?error=server_error`);
   }
 };
 

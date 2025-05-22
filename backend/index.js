@@ -5,31 +5,36 @@ const app = express();
 const cors = require("cors");
 const connectDB = require("./config/db");
 const cookieParser = require("cookie-parser");
-const passport = require("passport");
-require("./config/passport");
+const passport = require("./config/passport");
 
 const PORT = process.env.PORT || 5001;
 
 // Updated CORS configuration to handle multiple origins
-app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl requests)
-    if(!origin) return callback(null, true);
-    
-    const allowedOrigins = [
-      process.env.CLIENT_URL || "http://localhost:5173",
-      "https://expense-tracker-vk78.vercel.app"
-    ];
-    
-    if(allowedOrigins.indexOf(origin) !== -1 || !origin || origin.includes("expense-tracker-vk78")) {
-      callback(null, true);
-    } else {
-      console.log(`CORS blocked for origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, curl requests)
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        process.env.CLIENT_URL || "http://localhost:5173",
+        "https://expense-tracker-vk78.vercel.app",
+      ];
+
+      if (
+        allowedOrigins.indexOf(origin) !== -1 ||
+        !origin ||
+        origin.includes("expense-tracker-vk78")
+      ) {
+        callback(null, true);
+      } else {
+        console.log(`CORS blocked for origin: ${origin}`);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
